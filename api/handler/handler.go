@@ -1,14 +1,13 @@
 package handler
 
-import "api-gateway/genproto/AuthenticationSevice/authentication"
-
-type handler struct {
-	authentication authentication.AuthenticationServiceClient
-}
+import (
+	au "api-gateway/genproto/AuthenticationSevice/authentication"
+	us "api-gateway/genproto/UserManagementSevice/user"
+)
 
 type HandlerConfig struct {
 }
 
-func New(authentication authentication.AuthenticationServiceClient) *handler {
-	return &handler{authentication: authentication}
+func New(authentication au.AuthenticationServiceClient, usermanagement us.UserManagementServiceClient) (AuthenticationHandler, UserManagementHandler) {
+	return NewAuthenticationHandler(authentication), NewUserManagementHandler(usermanagement)
 }

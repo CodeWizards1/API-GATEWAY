@@ -8,8 +8,8 @@ service UserManagementService {
     rpc GetUserById(IdUserRequest) returns (UserResponse) {}
     rpc UpdateUserById(UpdateUserRequest) returns (UserResponse) {}
     rpc DeleteUserById(IdUserRequest) returns (DeleteUserResponse) {}
-    rpc GetUserProfile(IdUserRequest) returns (UserProfileResponse) {}
-    rpc UpdateUserProfile(UserProfileRequest) returns (UserProfileResponse) {}
+    rpc GetUserProfileById(IdUserRequest) returns (UserProfileResponse) {}
+    rpc UpdateUserProfileById(UserProfileRequest) returns (UserProfileResponse) {}
 }
 
 // User
