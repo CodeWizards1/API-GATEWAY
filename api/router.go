@@ -11,13 +11,13 @@ import (
 
 type Option struct{}
 
-func New(conn *grpc.ClientConn) *gin.Engine {
+func New(conn1, conn2 *grpc.ClientConn) *gin.Engine {
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	authenticationClient := authentication.NewAuthenticationServiceClient(conn)
-	usermanagementClient := user.NewUserManagementServiceClient(conn)
+	authenticationClient := authentication.NewAuthenticationServiceClient(conn1)
+	usermanagementClient := user.NewUserManagementServiceClient(conn2)
 
 	authHandler, userHandler := handler.New(authenticationClient, usermanagementClient)
 

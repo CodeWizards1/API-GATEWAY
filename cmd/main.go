@@ -8,14 +8,28 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+func Connect(port string) (*grpc.ClientConn, error) {
+	conn, err := grpc.NewClient(port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
+}
+
 func main() {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn1, err := Connect("localhost:50051")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
+	defer conn1.Close()
 
-	server := api.New(conn)
+	conn2, err := Connect("localhost:50052")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn2.Close()
+
+	server := api.New(conn1, conn2)
 
 	if err := server.Run(":7070"); err != nil {
 		log.Fatal(err)
