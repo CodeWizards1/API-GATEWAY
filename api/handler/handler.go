@@ -1,8 +1,8 @@
 package handler
 
 import (
-	au "api-gateway/genproto/AuthenticationSevice/authentication"
-	us "api-gateway/genproto/UserManagementSevice/user"
+	au "api-gateway/genproto/AuthentificationService"
+	us "api-gateway/genproto/UserManagementService"
 )
 
 type HandlerConfig struct {

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"api-gateway/genproto/AuthenticationSevice/authentication"
+	auth "api-gateway/genproto/AuthentificationService"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -13,15 +13,15 @@ type AuthenticationHandler interface {
 }
 
 type authenticationHandler struct {
-	authentication authentication.AuthenticationServiceClient
+	authentication auth.AuthenticationServiceClient
 }
 
-func NewAuthenticationHandler(authentication authentication.AuthenticationServiceClient) AuthenticationHandler {
+func NewAuthenticationHandler(authentication auth.AuthenticationServiceClient) AuthenticationHandler {
 	return &authenticationHandler{authentication: authentication}
 }
 
 func (h *authenticationHandler) CreateUser(c *gin.Context) {
-	var req authentication.UserRequest
+	var req auth.UserRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println(err)
@@ -40,7 +40,7 @@ func (h *authenticationHandler) CreateUser(c *gin.Context) {
 }
 
 func (h *authenticationHandler) Login(c *gin.Context) {
-	var req authentication.AutorizationRequest
+	var req auth.AutorizationRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println(err)

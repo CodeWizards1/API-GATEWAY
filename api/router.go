@@ -2,8 +2,8 @@ package api
 
 import (
 	"api-gateway/api/handler"
-	"api-gateway/genproto/AuthenticationSevice/authentication"
-	"api-gateway/genproto/UserManagementSevice/user"
+	auth "api-gateway/genproto/AuthentificationService"
+	user "api-gateway/genproto/UserManagementService"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -16,7 +16,7 @@ func New(conn1, conn2 *grpc.ClientConn) *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	authenticationClient := authentication.NewAuthenticationServiceClient(conn1)
+	authenticationClient := auth.NewAuthenticationServiceClient(conn1)
 	usermanagementClient := user.NewUserManagementServiceClient(conn2)
 
 	authHandler, userHandler := handler.New(authenticationClient, usermanagementClient)

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"api-gateway/genproto/UserManagementSevice/user"
+	user "api-gateway/genproto/UserManagementService"
 	"log"
 
 	"github.com/gin-gonic/gin"
