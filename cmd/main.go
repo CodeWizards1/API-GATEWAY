@@ -29,7 +29,13 @@ func main() {
 	}
 	defer conn2.Close()
 
-	server := api.New(conn1, conn2)
+	conn3, err := Connect("localhost:50053")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn3.Close()
+
+	server := api.New(conn1, conn2, conn3)
 
 	if err := server.Run(":7070"); err != nil {
 		log.Fatal(err)
