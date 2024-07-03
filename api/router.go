@@ -3,8 +3,10 @@ package api
 import (
 	"api-gateway/api/handler"
 	auth "api-gateway/genproto/AuthentificationService"
-	user "api-gateway/genproto/UserManagementService"
 	garden "api-gateway/genproto/GardenManagementService"
+	sustain "api-gateway/genproto/SustainabilityService"
+	user "api-gateway/genproto/UserManagementService"
+	com "api-gateway/genproto/CommunityService"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -12,7 +14,7 @@ import (
 
 type Option struct{}
 
-func New(conn1, conn2, conn3 *grpc.ClientConn) *gin.Engine {
+func New(conn1, conn2, conn3, conn4, conn5 *grpc.ClientConn) *gin.Engine {
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
@@ -20,8 +22,10 @@ func New(conn1, conn2, conn3 *grpc.ClientConn) *gin.Engine {
 	authenticationClient := auth.NewAuthenticationServiceClient(conn1)
 	usermanagementClient := user.NewUserManagementServiceClient(conn2)
 	gardenmanagementClient := garden.NewGardenManagementServiceClient(conn3)
+	sustainabilityClient := sustain.NewSustainabilityServiceClient(conn4)
+	communityClient := com.NewCommunityServiceClient(conn5)
 
-	authHandler, userHandler, gardenHandler := handler.New(authenticationClient, usermanagementClient, gardenmanagementClient)
+	authHandler, userHandler, gardenHandler, sustainabilityHandler, communityHandler := handler.New(authenticationClient, usermanagementClient, gardenmanagementClient, sustainabilityClient, communityClient)
 
 	crud := router.Group("/")
 	{
@@ -48,6 +52,46 @@ func New(conn1, conn2, conn3 *grpc.ClientConn) *gin.Engine {
 		crud.DELETE("/api/garden/plant/:id", gardenHandler.DeletePlantByPlantsID)
 		crud.POST("/api/garden/carelog", gardenHandler.CreateCareLogByPlantID)
 		crud.GET("/api/garden/carelog/:id", gardenHandler.GetCareLogsByPlantID)
+
+		// Community Management
+		/*
+		- POST /api/communities
+		- GET /api/communities/{id}
+		- PUT /api/communities/{id}
+		- DELETE /api/communities/{id}
+		- GET /api/communities
+		- POST /api/communities/{id}/join
+		- POST /api/communities/{id}/leave
+		- POST /api/communities/{id}/events
+		- GET /api/communities/{id}/events
+		- POST /api/communities/{id}/forum
+		- GET /api/communities/{id}/forum
+		- POST /api/forum/{id}/comments
+		- GET /api/forum/{id}/comments
+		*/
+		crud.POST("/api/communities", communityHandler.CreateCommunity)
+		crud.GET("/api/communities/:id", communityHandler.GetCommunityBy)
+		crud.PUT("/api/communities/:id", communityHandler.UpdateCommunity)
+		crud.DELETE("/api/communities/:id", communityHandler.DeleteCommunity)
+		crud.GET("/api/communities", communityHandler.GetAllCommunity)
+		crud.POST("/api/communities/:id/join", communityHandler.JoinCommunity)
+		crud.POST("/api/communities/:id/leave", communityHandler.LeaveCommunity)
+		crud.POST("/api/communities/:id/events", communityHandler.CreateCommunityEvent)
+		crud.GET("/api/communities/:id/events", communityHandler.GetCommunityEventBy)
+
+
+		// Sustainability
+		crud.POST("/api/impact/log", sustainabilityHandler.LogImpact)
+		crud.GET("/api/users/:id/impact", sustainabilityHandler.GetUserImpact)
+		crud.GET("/api/communities/:id/impact", sustainabilityHandler.GetCommunityImpact)
+		crud.GET("/api/challenges", sustainabilityHandler.GetChallenges)
+		crud.POST("/api/challenges/:id/join", sustainabilityHandler.JoinChallenge)
+		crud.PUT("/api/challenges/:id/progress", sustainabilityHandler.UpdateChallengeProgress)
+		crud.GET("/api/users/:id/challenges", sustainabilityHandler.GetUserChallenges)
+		crud.GET("/api/leaderboard/users", sustainabilityHandler.GetUserLeaderboard)
+		crud.GET("/api/leaderboard/communities", sustainabilityHandler.GetCommunityLeaderboard)
+		crud.POST("/api/post/challange", sustainabilityHandler.PostChallenges)
+
 	}
 
 	return router
