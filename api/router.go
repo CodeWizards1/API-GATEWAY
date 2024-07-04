@@ -54,31 +54,15 @@ func New(conn1, conn2, conn3, conn4, conn5 *grpc.ClientConn) *gin.Engine {
 		crud.GET("/api/garden/carelog/:id", gardenHandler.GetCareLogsByPlantID)
 
 		// Community Management
-		/*
-		- POST /api/communities
-		- GET /api/communities/{id}
-		- PUT /api/communities/{id}
-		- DELETE /api/communities/{id}
-		- GET /api/communities
-		- POST /api/communities/{id}/join
-		- POST /api/communities/{id}/leave
-		- POST /api/communities/{id}/events
-		- GET /api/communities/{id}/events
-		- POST /api/communities/{id}/forum
-		- GET /api/communities/{id}/forum
-		- POST /api/forum/{id}/comments
-		- GET /api/forum/{id}/comments
-		*/
 		crud.POST("/api/communities", communityHandler.CreateCommunity)
 		crud.GET("/api/communities/:id", communityHandler.GetCommunityBy)
 		crud.PUT("/api/communities/:id", communityHandler.UpdateCommunity)
 		crud.DELETE("/api/communities/:id", communityHandler.DeleteCommunity)
 		crud.GET("/api/communities", communityHandler.GetAllCommunity)
-		crud.POST("/api/communities/:id/join", communityHandler.JoinCommunity)
-		crud.POST("/api/communities/:id/leave", communityHandler.LeaveCommunity)
+		crud.POST("/api/communities/join/:id", communityHandler.JoinCommunity)
+		crud.POST("/api/communities/leave/:id", communityHandler.LeaveCommunity)
 		crud.POST("/api/communities/:id/events", communityHandler.CreateCommunityEvent)
 		crud.GET("/api/communities/:id/events", communityHandler.GetCommunityEventBy)
-
 
 		// Sustainability
 		crud.POST("/api/impact/log", sustainabilityHandler.LogImpact)

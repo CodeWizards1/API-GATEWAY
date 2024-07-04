@@ -60,7 +60,11 @@ func (h *communityHandler) GetCommunityBy(c *gin.Context) {
 
 // 3
 func (h *communityHandler) UpdateCommunity(c *gin.Context) {
-	var req com.Community
+	id := c.Param("id")
+	var req = com.Community{
+		Id: id,
+	}
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.IndentedJSON(400, gin.H{"error": err.Error()})
 		return
@@ -108,7 +112,10 @@ func (h *communityHandler) GetAllCommunity(c *gin.Context) {
 
 // 6
 func (h *communityHandler) JoinCommunity(c *gin.Context) {
-	var req com.JoinCommunityRequest
+	id := c.Param("id")
+	var req = com.JoinCommunityRequest{
+		UserId: id,
+	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.IndentedJSON(400, gin.H{"error": err.Error()})
 		return
@@ -125,7 +132,10 @@ func (h *communityHandler) JoinCommunity(c *gin.Context) {
 
 // 7
 func (h *communityHandler) LeaveCommunity(c *gin.Context) {
-	var req com.LeaveCommunityRequest
+	id := c.Param("id")
+	var req = com.LeaveCommunityRequest{
+		UserId: id,
+	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.IndentedJSON(400, gin.H{"error": err.Error()})
 		return
@@ -142,7 +152,10 @@ func (h *communityHandler) LeaveCommunity(c *gin.Context) {
 
 // 8
 func (h *communityHandler) CreateCommunityEvent(c *gin.Context) {
-	var req com.Event
+	id := c.Param("id")
+	var req = com.Event{
+		CommunityId: id,
+	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.IndentedJSON(400, gin.H{"error": err.Error()})
 		return
