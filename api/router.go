@@ -3,10 +3,10 @@ package api
 import (
 	"api-gateway/api/handler"
 	auth "api-gateway/genproto/AuthentificationService"
+	com "api-gateway/genproto/CommunityService"
 	garden "api-gateway/genproto/GardenManagementService"
 	sustain "api-gateway/genproto/SustainabilityService"
 	user "api-gateway/genproto/UserManagementService"
-	com "api-gateway/genproto/CommunityService"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -34,11 +34,11 @@ func New(conn1, conn2, conn3, conn4, conn5 *grpc.ClientConn) *gin.Engine {
 		crud.POST("/api/auth/login", authHandler.Login)
 
 		// User Management
-		crud.GET("/api/user/:id", userHandler.GetUserByID)
-		crud.PUT("/api/user/:id", userHandler.UpdateUserByID)
+		crud.GET("/api/user/:id", userHandler.GetUserByID) //ok
+		crud.PUT("/api/user/:id", userHandler.UpdateUserByID) //
 		crud.DELETE("/api/user/:id", userHandler.DeleteUserByID)
 		crud.GET("/api/user/profile/:id", userHandler.GetUserProfileById)
-		crud.PUT("/api/user/profile/:id", userHandler.UpdateUserProfileById)
+		// crud.PUT("/api/user/profile/:id", userHandler.UpdateUserProfileById)
 
 		// Garden Management
 		crud.POST("/api/garden", gardenHandler.CreateGarden)

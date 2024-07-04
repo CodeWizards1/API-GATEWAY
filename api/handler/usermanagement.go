@@ -12,7 +12,7 @@ type UserManagementHandler interface {
 	UpdateUserByID(c *gin.Context)
 	DeleteUserByID(c *gin.Context)
 	GetUserProfileById(c *gin.Context)
-	UpdateUserProfileById(c *gin.Context)
+	// UpdateUserProfileById(c *gin.Context)
 }
 
 type userManagementHandler struct {
@@ -94,24 +94,24 @@ func (h *userManagementHandler) GetUserProfileById(c *gin.Context) {
 	c.IndentedJSON(200, res)
 }
 
-func (h *userManagementHandler) UpdateUserProfileById(c *gin.Context) {
-	id := c.Param("id")
+// func (h *userManagementHandler) UpdateUserProfileById(c *gin.Context) {
+// 	id := c.Param("id")
 
-	var req = user.UserProfileRequest{
-		UserId: id,
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Println(err)
-		c.IndentedJSON(400, gin.H{"error": err.Error()})
-		return
-	}
+// 	var req = user.UserProfileRequest{
+// 		UserId: id,
+// 	}
+// 	if err := c.ShouldBindJSON(&req); err != nil {
+// 		log.Println(err)
+// 		c.IndentedJSON(400, gin.H{"error": err.Error()})
+// 		return
+// 	}
 
-	res, err := h.usermanagement.UpdateUserProfileById(c, &req)
-	if err != nil {
-		log.Println(err)
-		c.IndentedJSON(500, gin.H{"error": err.Error()})
-		return
-	}
+// 	res, err := h.usermanagement.UpdateUserProfileById(c, &req)
+// 	if err != nil {
+// 		log.Println(err)
+// 		c.IndentedJSON(500, gin.H{"error": err.Error()})
+// 		return
+// 	}
 
-	c.IndentedJSON(200, res)
-}
+// 	c.IndentedJSON(200, res)
+// }
