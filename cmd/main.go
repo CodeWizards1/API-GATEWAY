@@ -2,6 +2,7 @@ package main
 
 import (
 	"api-gateway/api"
+	"api-gateway/api/handler"
 	"log"
 
 	"google.golang.org/grpc"
@@ -47,7 +48,12 @@ func main() {
 	}
 	defer conn5.Close()
 
-	server := api.New(conn1, conn2, conn3, conn4, conn5)
+	server := api.New(&handler.Server{
+		Usermanagement:      conn2,
+		Gargardenmanagement: conn3,
+		Sustainability:      conn4,
+		Community:           conn5,
+	})
 
 	if err := server.Run(":7070"); err != nil {
 		log.Fatal(err)

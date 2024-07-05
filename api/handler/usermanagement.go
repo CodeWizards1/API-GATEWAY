@@ -8,6 +8,8 @@ import (
 )
 
 type UserManagementHandler interface {
+	CreateUser(c *gin.Context)
+	Login(c *gin.Context)
 	GetUserByID(c *gin.Context)
 	UpdateUserByID(c *gin.Context)
 	DeleteUserByID(c *gin.Context)
@@ -21,6 +23,44 @@ type userManagementHandler struct {
 
 func NewUserManagementHandler(usermanagement user.UserManagementServiceClient) UserManagementHandler {
 	return &userManagementHandler{usermanagement: usermanagement}
+}
+
+func (h *userManagementHandler) CreateUser(c *gin.Context) {
+	var req user.UserRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println(err)
+		c.IndentedJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := h.usermanagement.CreateUser(c, &req)
+	if err != nil {
+		log.Println(err)
+		c.IndentedJSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, res)
+}
+
+func (h *userManagementHandler) Login(c *gin.Context) {
+	var req user.AutorizationRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println(err)
+		c.IndentedJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := h.usermanagement.Login(c, &req)
+	if err != nil {
+		log.Println(err)
+		c.IndentedJSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(200, res)
 }
 
 func (h *userManagementHandler) GetUserByID(c *gin.Context) {
@@ -97,7 +137,7 @@ func (h *userManagementHandler) GetUserProfileById(c *gin.Context) {
 func (h *userManagementHandler) UpdateUserProfileById(c *gin.Context) {
 	id := c.Param("id")
 
-	var req = user.UserProfileRequest{
+	var req = user.UpdateUserProfileRequest{
 		UserId: id,
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
