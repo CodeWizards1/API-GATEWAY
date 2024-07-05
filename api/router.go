@@ -4,12 +4,16 @@ import (
 	"api-gateway/api/handler"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 )
+
+var jwtKey = []byte("secret-key")
 
 func New(server *handler.Server) *gin.Engine {
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(AuthMiddleware)
 
 	handeler := handler.NewHandlerConfig(server)
 
@@ -67,4 +71,26 @@ func New(server *handler.Server) *gin.Engine {
 	}
 
 	return router
+}
+
+func VerifyJWTMiddleware(ctx *gin.Context) {
+	tokenStr := ctx.GetHeader("Authorization")
+
+	if tokenStr == "" {
+		ctx.IndentedJSON(401, gin.H{"error": "unauthorized"})
+		ctx.Abort()
+		return
+	}
+
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	if err != nil || !token.Valid {
+		ctx.IndentedJSON(401, gin.H{"error": "token expired: " + tokenStr})
+		ctx.Abort()
+		return
+	}
+
+	ctx.Next()
 }
