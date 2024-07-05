@@ -3,9 +3,18 @@ package handler
 import (
 	user "api-gateway/genproto/UserManagementService"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 )
+
+var jwtKey = []byte("secret-key")
+
+type Claims struct {
+	Email string `json:"email,omitempty"`
+	jwt.StandardClaims
+}
 
 type UserManagementHandler interface {
 	CreateUser(c *gin.Context)
@@ -25,6 +34,36 @@ func NewUserManagementHandler(usermanagement user.UserManagementServiceClient) U
 	return &userManagementHandler{usermanagement: usermanagement}
 }
 
+func (h *userManagementHandler) Login(c *gin.Context) {
+	var req user.AutorizationRequest
+	req.Email = c.GetHeader("email")
+	req.Password = c.GetHeader("password")
+
+	res, err := h.usermanagement.Login(c, &req)
+	if err != nil {
+		log.Println(err)
+		c.IndentedJSON(500, gin.H{"error": "failed to login: " + err.Error()})
+		return
+	}
+
+	if res.Message == "Login Successful" {
+		exprTime := time.Now().Add(time.Hour)
+		claims := &Claims{
+			Email: req.Email,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: exprTime.Unix(),
+			},
+		}
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		strToken, err := token.SignedString(jwtKey)
+		if err != nil {
+			log.Println(err)
+			c.IndentedJSON(500, gin.H{"error": err.Error()})
+		}
+		c.IndentedJSON(200, gin.H{"token": strToken})
+	}
+}
+
 func (h *userManagementHandler) CreateUser(c *gin.Context) {
 	var req user.UserRequest
 
@@ -35,25 +74,6 @@ func (h *userManagementHandler) CreateUser(c *gin.Context) {
 	}
 
 	res, err := h.usermanagement.CreateUser(c, &req)
-	if err != nil {
-		log.Println(err)
-		c.IndentedJSON(500, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.IndentedJSON(200, res)
-}
-
-func (h *userManagementHandler) Login(c *gin.Context) {
-	var req user.AutorizationRequest
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Println(err)
-		c.IndentedJSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	res, err := h.usermanagement.Login(c, &req)
 	if err != nil {
 		log.Println(err)
 		c.IndentedJSON(500, gin.H{"error": err.Error()})
