@@ -24,7 +24,7 @@ func main() {
 	}
 	defer conn1.Close()
 
-	conn2, err := Connect("localhost:50052")
+	conn2, err := Connect("localhost:50049")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func main() {
 		Community:           conn5,
 	})
 
-	if err := server.Run(":7070"); err != nil {
+	if err := server.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
 }

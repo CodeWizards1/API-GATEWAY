@@ -2,7 +2,9 @@ package handler
 
 import (
 	user "api-gateway/genproto/UserManagementService"
+	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -39,14 +41,15 @@ func (h *userManagementHandler) Login(c *gin.Context) {
 	req.Email = c.GetHeader("email")
 	req.Password = c.GetHeader("password")
 
+	fmt.Println(req.Email, req.Password)
 	res, err := h.usermanagement.Login(c, &req)
 	if err != nil {
 		log.Println(err)
-		c.IndentedJSON(500, gin.H{"error": "failed to login: " + err.Error()})
+		c.JSON(500, gin.H{"error": "failed to login: " + err.Error()})
 		return
 	}
-
-	if res.Message == "Login Successful" {
+	fmt.Println(res.Message)
+	if res.Message == "Login successful" {
 		exprTime := time.Now().Add(time.Hour)
 		claims := &Claims{
 			Email: req.Email,
@@ -58,9 +61,12 @@ func (h *userManagementHandler) Login(c *gin.Context) {
 		strToken, err := token.SignedString(jwtKey)
 		if err != nil {
 			log.Println(err)
-			c.IndentedJSON(500, gin.H{"error": err.Error()})
+			c.JSON(500, gin.H{"error": err.Error()})
 		}
-		c.IndentedJSON(200, gin.H{"token": strToken})
+		c.JSON(200, gin.H{"token": strToken})
+	} else {
+
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "email or password not valid"})
 	}
 }
 

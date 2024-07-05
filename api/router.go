@@ -2,6 +2,8 @@ package api
 
 import (
 	"api-gateway/api/handler"
+	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -13,14 +15,15 @@ func New(server *handler.Server) *gin.Engine {
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
-	router.Use(AuthMiddleware)
-
 	handeler := handler.NewHandlerConfig(server)
+	router.POST("api/user/login", handeler.Usermanagement.Login)
+	router.POST("api/user/register", handeler.Usermanagement.CreateUser)
+
+	router.Use(VerifyJWTMiddleware)
 
 	user := router.Group("/api/user")
 	{
-		user.POST("/register", handeler.Usermanagement.CreateUser)
-		user.POST("/login", handeler.Usermanagement.Login)
+
 		user.GET("/:id", handeler.Usermanagement.GetUserByID)
 		user.PUT("/:id", handeler.Usermanagement.UpdateUserByID)
 		user.DELETE("/:id", handeler.Usermanagement.DeleteUserByID)
@@ -76,18 +79,23 @@ func New(server *handler.Server) *gin.Engine {
 func VerifyJWTMiddleware(ctx *gin.Context) {
 	tokenStr := ctx.GetHeader("Authorization")
 
-	if tokenStr == "" {
+	if !strings.HasPrefix(tokenStr, "Bearer ") {
 		ctx.IndentedJSON(401, gin.H{"error": "unauthorized"})
 		ctx.Abort()
 		return
 	}
 
+	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
 		return jwtKey, nil
 	})
 
 	if err != nil || !token.Valid {
-		ctx.IndentedJSON(401, gin.H{"error": "token expired: " + tokenStr})
+		ctx.IndentedJSON(401, gin.H{"error": "invalid token"})
 		ctx.Abort()
 		return
 	}
